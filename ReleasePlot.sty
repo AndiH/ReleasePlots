@@ -1,0 +1,75 @@
+\NeedsTeXFormat{LaTeX2e}[1994/06/01]
+\ProvidesPackage{ReleasePlot}[2015/08/05 List of Plots for Release]
+
+% INFO:
+% Provides \plotRelease command for tagging a figure for release. Also provides \listofreleaseplots to create a, you guessed it, list of figures for release.
+%
+% Originally written for the PANDA experiment.
+%
+%
+% USAGE:
+%     Put \usepackage{ReleasePlot} in your preamble;
+%     use \plotRelease in the caption of every figure you want to tag for release;
+%     finally use \listofreleaseplots at the corresponding position in your document where you want to print the actual list of release plots.
+%
+%     For the list of release plots, the optional additional caption[] argument of the image is used. If you do not intend to provide one of these, you can use the starred command, \plotRelease*, in which you wrap the text in your caption in square brackets, e.g. \caption{\plotRelease*[Figure description]}. (If you rather like curly brackets, use \plotReleaseCurly{Figure description} instead)
+%
+% ADDITIONAL FEATURES:
+%     The involved phrases and colors can be re-defined in your LaTeX file to match your likings:
+%     * \renewcommand{\RPChapterTitle}{New Chapter Title}  % changes the title of the list of figures and with this also the entry in the table of contents
+%     * \renewcommand{\RPText}{Tag name}  % changes the word which is printed in the caption of each figure for which the \plotRelease command is invoked (the tag)
+%     * \colorlet{RPTagColor}{blue}  % changes the color of the tag to blue, check the xcolor documentation for a guide how to use color; default is a slightly darker green
+%
+% CAVEATS:
+%     Currently, this package only properly supports the memoir document class (which you should use!). Other classes work, in principle, but the list of plots for release is strangely right-aligned...
+
+
+\makeatletter
+\@ifclassloaded{memoir}
+{} % true
+{\RequirePackage{tocloft}\PackageWarning{ReleasePlot}{You are not using document class memoir. The support is only limited.}} % false
+\makeatother
+
+% General setup
+\RequirePackage{hyperref}
+\RequirePackage[x11names]{xcolor}
+\RequirePackage{xspace}
+\RequirePackage{xparse}
+
+% Setup the text to print at each figure
+\colorlet{RPTagColor}{Green4!80!black}
+\newcommand{\RPText}{\textcolor{RPTagColor}{\textsc{\textbf{[release]}}}\xspace}
+
+% Create the list of something
+\makeatletter
+\@ifclassloaded{memoir}
+{\newcommand{\RPlistname}{listofreleaseplots}} % true
+{\newcommand{\RPlistname}{releaseplots}} % false
+\makeatother
+
+\newcommand{\RPChapterTitle}{List of Plots for Release}
+\newlistof{\RPlistname}{rlsplt}{\RPChapterTitle}
+\newcounter{releaseplot}
+\makeatletter
+\@ifclassloaded{memoir}
+{\newlistentry{releaseplot}{rlsplt}{0}} % true
+{} % false
+\makeatother
+\renewcommand{\thereleaseplot}{\arabic{releaseplot}}
+
+% Create command for tagging each figure and adding its caption into the ToC
+\DeclareRobustCommand{\plotReleaseCurly}[1]{
+	\RPText{} #1%
+	\addcontentsline{rlsplt}{releaseplot}{\protect\numberline{\thefigure}{#1~}}%
+}
+\makeatletter
+\DeclareDocumentCommand{\plotRelease}{s o}{
+  \IfBooleanTF{#1}{%
+  	\plotReleaseCurly{#2}%
+  }{%
+	\RPText%
+	\addcontentsline{rlsplt}{releaseplot}{\protect\numberline{\thefigure}{\@currentlabelname~}}%
+  }
+}
+\makeatother
+\endinput

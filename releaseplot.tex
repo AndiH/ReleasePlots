@@ -1,0 +1,108 @@
+% \documentclass{report}
+\documentclass[article,oneside]{memoir}  % article is a pseudo-class of memoir
+\counterwithout{section}{chapter}  % make chapters disappear
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+\usepackage[demo]{graphicx}
+\usepackage{hyperref}
+\usepackage[final=true]{minted}
+\newminted[codeLATEXblock]{latex}{breaklines=true,autogobble=true}
+\newmintinline[codeLATEX]{latex}{breaklines=true,fontsize=\small,autogobble=true}
+
+\usepackage{ReleasePlot}
+
+\newcommand{\version}{1.0}
+\newcommand{\currentdate}{5 August 2015}
+\renewcommand{\author}{Andreas Herten}
+
+\begin{document}
+\chapter*{Documentation for \LaTeX{} package \emph{Plots for Release}}
+This document annotates the package file \texttt{ReleasePlot.sty}, a possible way to tag and summarize figures for release in a \LaTeX{} document.
+\vspace{2ex}
+
+\noindent TL;DR: Use \codeLATEX|\plotRelease| to tag a picture for release visually and add it to a list of plots for release.
+
+\vspace{2ex}
+
+\noindent Version \texttt{\version}, \currentdate{} by \author{} for the PANDA experiment.
+
+\tableofcontents
+
+\section{Usage} % (fold)
+\label{sec:usage}
+After loading the package via \codeLATEX|\usepackage{ReleasePlot}|, adding the \codeLATEX|\plotRelease| tag to any caption of a figure will do two things:
+\begin{itemize}
+	\item It will print a \textbf{tagging} word at the position of the command. Default is a green small-caps \emph{release} in square brackets, \RPText. This can be changed, see below.
+	\item The figure will be added to the list of \emph{plots for release}, which can be printed using \codeLATEX|\listofreleaseplots| at any position in the document.
+
+	The figure's optional additional caption argument, provided in square brackets like \codeLATEX|\caption[optional]{mandatory}|, is taken as a description -- just like in \codeLATEX|\listoffigures|.
+
+	If the user does not intend to provide the square-bracket arguments, the package provides an starred version of the tagging command, \codeLATEX|\plotRelease*[]|, in which the text of the caption can be wrapped, i.e. like\\
+	\codeLATEX|\caption{\plotRelease*[This is a nice figure.]}|.\footnote{If curly brackets are preferred over square brackets, \codeLATEX|\plotReleaseCurly{}| can be used. The square-bracket version has been chosen to provide a visually close starred command.}
+\end{itemize}
+% section usage (end)
+\clearpage
+\section{Modification of Default Parameters} % (fold)
+\label{sec:modification}
+Color and text are internally handled via \LaTeX{} macros, making it possible to be overridden by user's commands after loading of the package. The modifications of the following macros are possible:
+\begin{description}
+	\item[\codeLATEX{\RPChapterTitle}] The title of the chapter of the list of figures.\\
+	Renew with \codeLATEX|\renewcommand{\RPChapterTitle}{New Chapter Title}|, default is \emph{List of Plots for Release}.
+	\item[\codeLATEX{\RPText}] The text of the tag printed in the caption of the figure.\\
+	Renew with \codeLATEX|\renewcommand{\RPText}{Tag name}|, default is\\
+	\codeLATEX|\textcolor{RPTagColor}{\textsc{\textbf{[release]}}}\xspace|.
+	\item[\codeLATEX{RPTagColor}] Color of the \codeLATEX|\RPText| text.\\
+	Change with \codeLATEX|\colorlet{RPTagColor}{black}|, default is \codeLATEX|Green4!80!black|.
+\end{description}
+% section modification (end)
+
+\section{Examples} % (fold)
+\label{sec:examples}
+Both possible use cases of \codeLATEX|\plotRelease| and \codeLATEX|\plotRelease*| are shown in the two pictures of this section which fill the \textbf{\hyperref[lorp]{List of Plots for Release}} at the end of this document. The code used to generate the figures follows accordingly.
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.5\textwidth]{something}
+	\caption[Optional Argument]{\plotRelease The non-starred version of the command takes the additional, square-bracketed argument of the \texttt{\textbackslash caption} macro.}
+\end{figure}
+
+\begin{codeLATEXblock}
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.5\textwidth]{something}
+	\caption[Optional Argument]{\plotRelease The non-starred version of the command takes the additional, square-bracketed argument of the \texttt{\textbackslash caption} macro.
+	}
+\end{figure}
+\end{codeLATEXblock}
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.5\textwidth]{somethingsomething}
+	\caption{\plotRelease*[The starred version of the command explicitly takes a text as parameter to the call.] This can, but does not need to be, the whole text of the caption.}
+\end{figure}
+
+
+\begin{codeLATEXblock}
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.5\textwidth]{somethingsomething}
+	\caption{\plotRelease*[The starred version of the command explicitly takes a text as parameter to the call.] This can, but does not need to be, the whole text of the caption.
+	}
+\end{figure}
+\end{codeLATEXblock}
+
+\section{Caveats} % (fold)
+\label{sec:caveats}
+There are some caveats to this package originating from the fact that I made it easiest usable for my personal use case.
+
+The most important caveat is the \textbf{document class}. The package currently works best with the document class \emph{memoir}, a very powerful, versatile, and feature-heavy class which you should use as well. In general, also other classes are supported, but the document might turn out looking funny.
+
+The \textbf{default command} uses a quite stupid way to retrieve the current figure's caption. This results in it taking only the square-bracket argument of the \codeLATEX|\caption|.\footnote{I do this anyway in all cases to have a more condensed figure caption for the list of figures.} Although the package provides an alternative, starred command, this is unnecessary inconvenient. It should be possible to mimic the \codeLATEX|\listoffigures| behavior $1:1$, but my \LaTeX{} inabilities are just too large.
+
+% section caveats (end)
+
+\listofreleaseplots
+\label{lorp}
+
+% section examples (end)
+\end{document}
